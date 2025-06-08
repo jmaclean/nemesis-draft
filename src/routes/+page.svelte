@@ -1,11 +1,12 @@
 <script lang="ts">
+  import championList from '../../static/champions.txt?raw'
   import {type DndEvent, dndzone} from "svelte-dnd-action";
   import _ from "lodash";
   import {setDebugMode} from "svelte-dnd-action";
-  // setDebugMode(true);
+
   type DraggableItem = {id: string, display: string};
 
-  let input: string | undefined = $state("Annie\nBrand\nCaitlyn\nDarius\nEvelyn\nFiddlesticks\nGaren\nHwei\nIrelia\nJhin");
+  let input: string | undefined = $state(championList);
   let choices = $derived(_.chain(input).split(/\r?\n/).map(line => line.trim()).filter().value());
   let draggableItems: {[id: string]: DraggableItem} = $derived(_.chain(choices).map(value => { return [value, {id: value, display: value}]; }).fromPairs().value());
 
@@ -78,9 +79,9 @@ const dndOptions = {dropTargetStyle: {outline: 'rgba(50, 50, 50, 0.7) dashed 2px
 
   </div>
 
-  <div class="choices">
+  <div class="choices-container">
     <span><b>Choices:</b></span>
-    <div use:dndzone={{items: pool, ...dndOptions}} on:consider={handleChoicesConsider} on:finalize={handleChoicesFinalize} class="choices">
+    <div class="choices" use:dndzone={{items: pool, ...dndOptions}} on:consider={handleChoicesConsider} on:finalize={handleChoicesFinalize}>
       {#each pool as item(item.id)}
         <div class="item">{item.display}</div>
       {/each}
@@ -109,11 +110,21 @@ const dndOptions = {dropTargetStyle: {outline: 'rgba(50, 50, 50, 0.7) dashed 2px
 </div>
 
 <style>
+    :global(body) {
+        background: #EEAECA;
+        background: linear-gradient(180deg, rgba(238, 174, 202, 0.62) 0%, rgba(148, 187, 233, 0.58) 100%);
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        scrollbar-color: lightcoral transparent;
+        scrollbar-width: thin;
+    }
     .grid {
+
         font-size: x-large;
         display: grid;
         grid-template-columns: 40px 1fr 1fr;
-        grid-template-rows: 100px 1fr 2fr;
+        grid-template-rows: 100px 1fr 1fr;
         grid-gap: 1em;
         height: 100%;
         grid-template-areas:
@@ -131,6 +142,7 @@ const dndOptions = {dropTargetStyle: {outline: 'rgba(50, 50, 50, 0.7) dashed 2px
         min-height: 200px;
         width: fit-content;
         font-size: large;
+        background-color: transparent;
     }
     .item {
         border: 1px solid black;
@@ -172,8 +184,17 @@ const dndOptions = {dropTargetStyle: {outline: 'rgba(50, 50, 50, 0.7) dashed 2px
         color: rgba(50, 50, 50, 0.85);
     }
 
-    .choices {
+    .choices-container {
         grid-area: choices;
+    }
+    .choices {
+        display: flex;
+        flex-direction: row;
+        gap: 0.2em;
+        flex-wrap: wrap;
+        /*width: 100%;*/
+        max-height: 500px;
+        overflow-y: scroll;
     }
     .team-a-container {
         grid-area: left-team;
