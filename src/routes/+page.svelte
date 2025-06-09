@@ -1,12 +1,16 @@
 <script lang="ts">
-  import championList from '../../static/champions.txt?raw'
+  // import championList from './static/champions.txt?raw'
   import {type DndEvent, dndzone} from "svelte-dnd-action";
   import _ from "lodash";
   import {setDebugMode} from "svelte-dnd-action";
+  import {onMount} from "svelte";
+  import {read} from "$app/server";
 
   type DraggableItem = {id: string, display: string};
 
-  let input: string | undefined = $state(championList);
+  // let {data}: { data: {champions: string}} = $props();
+
+  let input: string | undefined = $state("");
   let choices = $derived(_.chain(input).split(/\r?\n/).map(line => line.trim()).filter().value());
   let draggableItems: {[id: string]: DraggableItem} = $derived(_.chain(choices).map(value => { return [value, {id: value, display: value}]; }).fromPairs().value());
 
@@ -14,6 +18,9 @@
   let teamA: DraggableItem[] = $state([]);
   let teamB: DraggableItem[] = $state([]);
 
+  onMount(async () => {
+    input = await (await fetch("/champions.txt")).text()
+  })
   // $inspect(pool, teamA, teamB);
 
   $effect(() => {
@@ -120,7 +127,6 @@ const dndOptions = {dropTargetStyle: {outline: 'rgba(50, 50, 50, 0.7) dashed 2px
         scrollbar-width: thin;
     }
     .grid {
-
         font-size: x-large;
         display: grid;
         grid-template-columns: 40px 1fr 1fr;
@@ -134,27 +140,22 @@ const dndOptions = {dropTargetStyle: {outline: 'rgba(50, 50, 50, 0.7) dashed 2px
     }
 
     textarea {
-        /*width: 100%;*/
-        /*height: 100%;*/
-        /*flex: 1;*/
-        /*resize: none;*/
         min-width: 200px;
         min-height: 200px;
         width: fit-content;
         font-size: large;
         background-color: transparent;
     }
+
     .item {
         border: 1px solid black;
         padding: 0.1em 0.5em;
         width: fit-content;
     }
 
-
     .team {
         min-width: 200px;
         min-height: 200px;
-        /*border: 1px solid black;*/
     }
 
     .header {
