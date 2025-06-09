@@ -1,10 +1,8 @@
 <script lang="ts">
-  // import championList from './static/champions.txt?raw'
   import {type DndEvent, dndzone} from "svelte-dnd-action";
   import _ from "lodash";
   import {setDebugMode} from "svelte-dnd-action";
   import {onMount} from "svelte";
-  import {read} from "$app/server";
 
   type DraggableItem = {id: string, display: string};
 
